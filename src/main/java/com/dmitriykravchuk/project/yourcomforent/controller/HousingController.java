@@ -19,17 +19,11 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/housing")
+@RequestMapping("/api/housing/")
 public class HousingController {
 
     @Autowired
     private HousingService housingService;
-
-    @PostMapping("/add")
-    public ResponseEntity<HousingDTO> createHousing(@ModelAttribute HousingDTO housing, @RequestParam("file") MultipartFile[] files) throws IOException, IOException {
-        HousingDTO newHousing = housingService.createHousing(housing, files);
-        return new ResponseEntity<>(newHousing, HttpStatus.OK);
-    }
 
     @GetMapping("/searchByCity/{city}")
     public List<Housing> searchByCity(@PathVariable("city") String city, @ModelAttribute Housing housing) {
@@ -42,15 +36,17 @@ public class HousingController {
     }
 
     @PutMapping("/updateHousing/{id}")
-    public HousingDTO updateHousing(@PathVariable Long id, @ModelAttribute HousingDTO housingDTO, @RequestParam("file") MultipartFile[] files) throws IOException {
+    public HousingDTO updateHousing(@PathVariable Long id, @ModelAttribute HousingDTO housingDTO,
+                                    @RequestParam("file") MultipartFile[] files,
+                                    @RequestParam("ownerId") Long ownerId) throws IOException {
         housingDTO.setId(id);
-        return housingService.updateHousing(id, housingDTO, files);
+        return housingService.updateHousing(id, housingDTO, files, ownerId);
     }
 
     @DeleteMapping("/deleteHousing/{id}")
     public ResponseEntity<String> deleteHousingById(@PathVariable Long id) {
         housingService.deleteHousing(id);
-        return new ResponseEntity<>("Housing "+ id + " delete successfully!", HttpStatus.OK);
+        return new ResponseEntity<>("Housing " + id + " delete successfully!", HttpStatus.OK);
     }
 
     @GetMapping("/getHousing/{id}")
@@ -59,16 +55,16 @@ public class HousingController {
     }
 
     @GetMapping("/getImagesByHousing/{id}")
-    public List<ImageDTO> getImageByHousingId(@PathVariable Long id){
+    public List<ImageDTO> getPhotoByHousingId(@PathVariable Long id) {
         return housingService.getImagesByHousingId(id);
     }
 
     @GetMapping("/{housingId}/image/{imageId}")
-    public ResponseEntity<ImageDTO> getImageById(@PathVariable Long housingId, @PathVariable Long imageId) {
+    public ResponseEntity<ImageDTO> getPhotoById(@PathVariable Long housingId, @PathVariable Long imageId) {
         log.info("Here start method getPhotoById");
         HousingDTO housing = housingService.getHousingById(housingId);
         ImageDTO image = null;
-        if (housing.getImages() != null ) {
+        if (housing.getImages() != null) {
             for (ImageDTO p : housing.getImages()) {
                 if (p.getId().equals(imageId) && p.getId() != null) {
                     image = p;
@@ -76,7 +72,7 @@ public class HousingController {
                 }
             }
         }
-        if (image == null){
+        if (image == null) {
             log.info("This message you can see if your image not found");
             throw new EntityNotFoundException("Image not found with this id: " + imageId);
         }
@@ -84,7 +80,7 @@ public class HousingController {
     }
 
     @DeleteMapping("/{housingId}/deleteImage/{imageId}")
-    public ResponseEntity<Void> deleteImage(@PathVariable Long housingId, @PathVariable Long imageId) {
+    public ResponseEntity<Void> deletePhoto(@PathVariable Long housingId, @PathVariable Long imageId) {
         housingService.deleteImageByIdFromHousingId(housingId, imageId);
         return ResponseEntity.noContent().build();
     }

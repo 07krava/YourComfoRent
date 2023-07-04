@@ -14,13 +14,13 @@ public interface HousingService {
 
     List<Housing> findByCity(String city);
 
-    HousingDTO createHousing(HousingDTO housingDTO, MultipartFile[] files) throws IOException;
+    HousingDTO createHousing(HousingDTO housingDTO, MultipartFile[] files, Long ownerId) throws IOException;
 
-    HousingDTO updateHousing(Long id, HousingDTO housingDTO, MultipartFile[] files) throws IOException;
+    HousingDTO updateHousing(Long id, HousingDTO housingDTO, MultipartFile[] files, Long ownerId) throws IOException;
 
     List<ImageDTO> getImagesByHousingId(Long housingId);
 
-    Image getImageById(Long housingId, Long imageId);
+    Image getImageById(Long housingId, Long photoId);
 
     List<HousingDTO> getAllHousing();
 

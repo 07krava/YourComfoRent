@@ -11,4 +11,3 @@ alter table booking add constraint FK52vua0nkv2hrl4e1kc5tstb3i foreign key (hous
 
 alter table booking add constraint FKkgseyy7t56x7lkjgu3wah5s3t foreign key (user_id)
     references user (id);
-

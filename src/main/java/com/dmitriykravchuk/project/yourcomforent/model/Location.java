@@ -3,15 +3,15 @@ package com.dmitriykravchuk.project.yourcomforent.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @Table(name = "Location")
 @Builder
 @AllArgsConstructor
@@ -40,10 +40,19 @@ public class Location {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "housing_id", referencedColumnName = "id")
     @MapsId
+    @ToString.Exclude
     private Housing housing;
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Location location = (Location) o;
+        return id != null && Objects.equals(id, location.id);
+    }
+
+    @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return getClass().hashCode();
     }
 }

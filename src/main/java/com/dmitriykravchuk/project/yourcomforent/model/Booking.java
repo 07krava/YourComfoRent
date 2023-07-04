@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -30,6 +31,17 @@ public class Booking {
     private Integer guests;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "renter_id", nullable = false)
+    private User renter;
+
+    @Column(name = "total_amount")
+    private BigDecimal totalAmountOfMoney;
+
+    private String currency;
+
+    private String status; // Pending, Canceled, Approved
 }

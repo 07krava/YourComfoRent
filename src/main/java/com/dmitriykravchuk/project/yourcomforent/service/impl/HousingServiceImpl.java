@@ -2,13 +2,11 @@ package com.dmitriykravchuk.project.yourcomforent.service.impl;
 
 import com.dmitriykravchuk.project.yourcomforent.dto.HousingDTO;
 import com.dmitriykravchuk.project.yourcomforent.dto.ImageDTO;
-import com.dmitriykravchuk.project.yourcomforent.model.Booking;
-import com.dmitriykravchuk.project.yourcomforent.model.Housing;
-import com.dmitriykravchuk.project.yourcomforent.model.Image;
-import com.dmitriykravchuk.project.yourcomforent.model.Location;
+import com.dmitriykravchuk.project.yourcomforent.model.*;
 import com.dmitriykravchuk.project.yourcomforent.repository.BookingRepository;
 import com.dmitriykravchuk.project.yourcomforent.repository.HousingRepository;
 import com.dmitriykravchuk.project.yourcomforent.repository.ImageRepository;
+import com.dmitriykravchuk.project.yourcomforent.repository.UserRepository;
 import com.dmitriykravchuk.project.yourcomforent.service.HousingService;
 import com.dmitriykravchuk.project.yourcomforent.service.ImageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,13 +31,15 @@ public class HousingServiceImpl implements HousingService {
     private final ImageRepository imageRepository;
     private final ImageService imageService;
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public HousingServiceImpl(HousingRepository housingRepository, BookingRepository bookingRepository, ImageRepository imageRepository, ImageService imageService) {
+    public HousingServiceImpl(HousingRepository housingRepository, BookingRepository bookingRepository, ImageRepository imageRepository, ImageService imageService, UserRepository userRepository) {
         this.housingRepository = housingRepository;
         this.imageRepository = imageRepository;
         this.imageService = imageService;
         this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -67,16 +67,24 @@ public class HousingServiceImpl implements HousingService {
         return result;
     }
 
-    //worked
     @Override
-    public HousingDTO createHousing(HousingDTO housingDTO, MultipartFile[] files) throws IOException {
+    public HousingDTO createHousing(HousingDTO housingDTO, MultipartFile[] files, Long ownerId) throws IOException {
+
+        User owner = userRepository.findById(ownerId).orElseThrow(() -> new EntityNotFoundException("Owner not found by id " ));
 
         Housing housing = new Housing();
         housing.setDescription(housingDTO.getDescription());
         housing.setTitle(housingDTO.getTitle());
         housing.setMaxAmountPeople(housingDTO.getMaxAmountPeople());
+        housing.setBeds(housingDTO.getBeds());
+        housing.setBedRooms(housingDTO.getBedRooms());
+        housing.setBathRooms(housingDTO.getBathRooms());
         housing.setPrice(housingDTO.getPrice());
+        housing.setHousingType(housingDTO.getHousingType());
         housing.setActive(housingDTO.isActive());
+
+        owner.getRoles().add(Role.OWNER);
+        housing.setOwner(owner);
 
         housingRepository.save(housing);
 
@@ -107,17 +115,25 @@ public class HousingServiceImpl implements HousingService {
         return convertToDTO(housing);
     }
 
-    // worked
     @Override
-    public HousingDTO updateHousing(Long housingId, HousingDTO housingDTO, MultipartFile[] files) throws IOException {
+    public HousingDTO updateHousing(Long housingId, HousingDTO housingDTO, MultipartFile[] files, Long ownerId) throws IOException {
         Housing housingEntity = housingRepository.findById(housingId)
                 .orElseThrow(() -> new EntityNotFoundException("Housing not found with id " + housingId));
+
+        // Check if the owner of the housing matches the provided ownerId
+        if (!housingEntity.getOwner().getId().equals(ownerId)) {
+            throw new UnauthorizedException("You are not authorized to update this housing.");
+        }
 
         // Update fields of HousingEntity based on HousingDTO
         housingEntity.setTitle(housingDTO.getTitle());
         housingEntity.setDescription(housingDTO.getDescription());
         housingEntity.setMaxAmountPeople(housingDTO.getMaxAmountPeople());
+        housingEntity.setBeds(housingDTO.getBeds());
+        housingEntity.setBedRooms(housingDTO.getBedRooms());
+        housingEntity.setBathRooms(housingDTO.getBathRooms());
         housingEntity.setPrice(housingDTO.getPrice());
+        housingEntity.setHousingType(housingDTO.getHousingType());
         housingEntity.setActive(housingDTO.isActive());
 
         Location location = housingEntity.getLocation();
@@ -162,20 +178,19 @@ public class HousingServiceImpl implements HousingService {
         return convertToDTO(savedHousing);
     }
 
-    // worked
     @Override
     public List<ImageDTO> getImagesByHousingId(Long housingId) {
         List<ImageDTO> imageDTOList = new ArrayList<>();
         Optional<Housing> housingOptional = housingRepository.findById(housingId);
         if (housingOptional.isPresent()) {
             Housing housing = housingOptional.get();
-            List<Image> images = housing.getImages();
-            if (images != null) {
-                imageDTOList = images.stream()
-                        .map(image -> ImageDTO.builder()
-                                .id(image.getId())
-                                .fileName(image.getFileName())
-                                .data(image.getData())
+            List<Image> photos = housing.getImages();
+            if (photos != null) {
+                imageDTOList = photos.stream()
+                        .map(photo -> ImageDTO.builder()
+                                .id(photo.getId())
+                                .fileName(photo.getFileName())
+                                .data(photo.getData())
                                 .build())
                         .collect(Collectors.toList());
             }
@@ -183,10 +198,9 @@ public class HousingServiceImpl implements HousingService {
         return imageDTOList;
     }
 
-    //worked
     @Override
     public Image getImageById(Long housingId, Long imageId) {
-        log.info("Start method getImageByIdFromHousingId");
+        log.info("Start method getPhotoByIdFromHousingId");
         Housing housing = housingRepository.findById(housingId).orElseThrow(() -> new EntityNotFoundException("Housing not found with id " + housingId));
         Image image = null;
         if (housing.getImages() != null) {
@@ -203,7 +217,6 @@ public class HousingServiceImpl implements HousingService {
         return image;
     }
 
-    //worked
     @Override
     public List<HousingDTO> getAllHousing() {
         List<Housing> housingEntities = housingRepository.findAll();
@@ -216,7 +229,6 @@ public class HousingServiceImpl implements HousingService {
         return housingDTOS;
     }
 
-    //worked
     @Override
     public void deleteHousing(Long id) {
         Optional<Housing> housingEntityOptional = housingRepository.findById(id);
@@ -230,7 +242,6 @@ public class HousingServiceImpl implements HousingService {
         }
     }
 
-    //worked
     @Override
     public void deleteImageByIdFromHousingId(Long housingId, Long imageId) {
         Housing housing = housingRepository.findById(housingId).orElseThrow(NullPointerException::new);
@@ -242,7 +253,6 @@ public class HousingServiceImpl implements HousingService {
         imageRepository.deleteById(imageId);
     }
 
-    //worked
     @Override
     public HousingDTO getHousingById(Long id) {
         Optional<Housing> housingEntityOptional = housingRepository.findById(id);

@@ -7,4 +7,3 @@ create table image (
 
 alter table image add constraint FKinf8aqvu8vwy2sx4cel8g7jhu foreign key (housing_id)
     references housing (id);
-

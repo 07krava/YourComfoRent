@@ -3,10 +3,8 @@ package com.dmitriykravchuk.project.yourcomforent.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,7 +13,9 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @Table(name = "housing")
 @Builder
 @AllArgsConstructor
@@ -28,6 +28,15 @@ public class Housing {
 
     @Column(name = "price")
     private BigDecimal price;
+
+    @Column(name = "quantity_bedrooms")
+    private Integer bedRooms;
+
+    @Column(name ="quantity_beds")
+    private Integer beds;
+
+    @Column(name = "quantity_bathrooms")
+    private Integer bathRooms;
 
     @Column(name = "description")
     private String description;
@@ -47,14 +56,34 @@ public class Housing {
 
     @JsonIgnore
     @OneToMany(mappedBy = "housing", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<Image> images = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "housing_type")
+    private HousingType housingType;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    @ToString.Exclude
+    private User owner;
 
     @JsonIgnore
     @OneToMany(mappedBy = "housing", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private Set<Booking> bookings;
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Housing housing = (Housing) o;
+        return id != null && Objects.equals(id, housing.id);
+    }
+
+    @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return getClass().hashCode();
     }
 }

@@ -2,6 +2,7 @@ package com.dmitriykravchuk.project.yourcomforent.dto;
 
 
 import com.dmitriykravchuk.project.yourcomforent.model.Housing;
+import com.dmitriykravchuk.project.yourcomforent.model.HousingType;
 import com.dmitriykravchuk.project.yourcomforent.model.Image;
 import com.dmitriykravchuk.project.yourcomforent.model.Location;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -27,6 +28,10 @@ public class HousingDTO {
     private String title;
     private boolean isActive;
     private Integer maxAmountPeople;
+    private Integer beds;
+    private Integer bedRooms;
+    private Integer bathRooms;
+    private HousingType housingType;
     private List<ImageDTO> images;
 
     public static HousingDTO convertToDTO(Housing housing){
@@ -34,9 +39,14 @@ public class HousingDTO {
         housingDTO.setId(housing.getId());
         housingDTO.setTitle(housing.getTitle());
         housingDTO.setMaxAmountPeople(housing.getMaxAmountPeople());
+        housingDTO.setBeds(housing.getBeds());
+        housingDTO.setBathRooms(housing.getBathRooms());
+        housingDTO.setBedRooms(housing.getBedRooms());
         housingDTO.setLocation(housing.getLocation());
         housingDTO.setPrice(housing.getPrice());
         housingDTO.setDescription(housing.getDescription());
+        housingDTO.setHousingType(housing.getHousingType());
+
         housingDTO.setActive(housing.isActive());
 
         LocationDTO location = new LocationDTO();
@@ -48,16 +58,16 @@ public class HousingDTO {
         location.setApartmentNumber(housing.getLocation().getApartmentNumber());
         location.setZipCode(housing.getLocation().getZipCode());
 
-        List<ImageDTO> imageDTOList = new ArrayList<>();
+        List<ImageDTO> photoDTOList = new ArrayList<>();
         for (Image image : housing.getImages()) {
             ImageDTO imageDTO = new ImageDTO();
             imageDTO.setId(image.getId());
             imageDTO.setFileName(image.getFileName());
             imageDTO.setData(image.getData());
-            imageDTOList.add(imageDTO);
+            photoDTOList.add(imageDTO);
         }
 
-        housingDTO.setImages(imageDTOList);
+        housingDTO.setImages(photoDTOList);
         return housingDTO;
     }
 
@@ -66,8 +76,12 @@ public class HousingDTO {
         housing.setId(housingDTO.getId());
         housing.setTitle(housingDTO.getTitle());
         housing.setMaxAmountPeople(housingDTO.getMaxAmountPeople());
+        housing.setBeds(housingDTO.getBeds());
+        housing.setBathRooms(housingDTO.getBathRooms());
+        housing.setBedRooms(housingDTO.getBedRooms());
         housing.setPrice(housingDTO.getPrice());
         housing.setDescription(housingDTO.getDescription());
+        housing.setHousingType(housingDTO.getHousingType());
         housing.setActive(housingDTO.isActive());
 
         Location location = new Location();

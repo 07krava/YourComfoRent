@@ -10,4 +10,3 @@ create table location (
 
 alter table location add constraint FKerymo068uh6mbfcig9btpvdnt foreign key (housing_id)
     references housing (id);
-
