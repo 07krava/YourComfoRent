@@ -37,7 +37,7 @@ public class WebSecurityConfig  {
                 .authorizeHttpRequests((authorizationHttpRequests) -> authorizationHttpRequests
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/user/**", "/api/housing/bookings/**", "/api/properties").hasAnyAuthority("USER","OWNER")
-                        .requestMatchers("/api/housing/**").hasAuthority("OWNER")
+                        .requestMatchers("/api/owner/**").hasAuthority("OWNER")
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());

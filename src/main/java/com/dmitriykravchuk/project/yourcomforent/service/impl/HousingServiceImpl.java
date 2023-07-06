@@ -3,12 +3,10 @@ package com.dmitriykravchuk.project.yourcomforent.service.impl;
 import com.dmitriykravchuk.project.yourcomforent.dto.HousingDTO;
 import com.dmitriykravchuk.project.yourcomforent.dto.ImageDTO;
 import com.dmitriykravchuk.project.yourcomforent.model.*;
-import com.dmitriykravchuk.project.yourcomforent.repository.BookingRepository;
 import com.dmitriykravchuk.project.yourcomforent.repository.HousingRepository;
 import com.dmitriykravchuk.project.yourcomforent.repository.ImageRepository;
 import com.dmitriykravchuk.project.yourcomforent.repository.UserRepository;
 import com.dmitriykravchuk.project.yourcomforent.service.HousingService;
-import com.dmitriykravchuk.project.yourcomforent.service.ImageService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +27,12 @@ public class HousingServiceImpl implements HousingService {
 
     private final HousingRepository housingRepository;
     private final ImageRepository imageRepository;
-    private final ImageService imageService;
-    private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public HousingServiceImpl(HousingRepository housingRepository, BookingRepository bookingRepository, ImageRepository imageRepository, ImageService imageService, UserRepository userRepository) {
+    public HousingServiceImpl(HousingRepository housingRepository, ImageRepository imageRepository, UserRepository userRepository) {
         this.housingRepository = housingRepository;
         this.imageRepository = imageRepository;
-        this.imageService = imageService;
-        this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
     }
 

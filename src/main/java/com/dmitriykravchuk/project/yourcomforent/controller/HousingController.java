@@ -55,13 +55,13 @@ public class HousingController {
     }
 
     @GetMapping("/getImagesByHousing/{id}")
-    public List<ImageDTO> getPhotoByHousingId(@PathVariable Long id) {
+    public List<ImageDTO> getImageByHousingId(@PathVariable Long id) {
         return housingService.getImagesByHousingId(id);
     }
 
     @GetMapping("/{housingId}/image/{imageId}")
-    public ResponseEntity<ImageDTO> getPhotoById(@PathVariable Long housingId, @PathVariable Long imageId) {
-        log.info("Here start method getPhotoById");
+    public ResponseEntity<ImageDTO> getImageById(@PathVariable Long housingId, @PathVariable Long imageId) {
+        log.info("Here start method getImageById");
         HousingDTO housing = housingService.getHousingById(housingId);
         ImageDTO image = null;
         if (housing.getImages() != null) {
@@ -80,7 +80,7 @@ public class HousingController {
     }
 
     @DeleteMapping("/{housingId}/deleteImage/{imageId}")
-    public ResponseEntity<Void> deletePhoto(@PathVariable Long housingId, @PathVariable Long imageId) {
+    public ResponseEntity<Void> deleteImage(@PathVariable Long housingId, @PathVariable Long imageId) {
         housingService.deleteImageByIdFromHousingId(housingId, imageId);
         return ResponseEntity.noContent().build();
     }

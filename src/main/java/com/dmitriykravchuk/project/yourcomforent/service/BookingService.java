@@ -13,4 +13,10 @@ public interface BookingService {
     Booking createBooking(Booking booking);
 
     List<Booking> getBookingsByUserId(Long userId);
+
+    List<Booking> getBookingsForOwner(Long ownerId);
+
+    void approveBooking(Long bookingId);
+
+    void rejectBooking(Long bookingId);
 }
